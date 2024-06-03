@@ -16,6 +16,6 @@ abstract class AppDataBase : RoomDatabase() {
     abstract val pomodoroDAO: PomodoroDAO
 
     companion object {
-        const val DATABASE_NAME = "pomoList_DB"
+        const val DATABASE_NAME = "pomoList_DB2"
     }
 }

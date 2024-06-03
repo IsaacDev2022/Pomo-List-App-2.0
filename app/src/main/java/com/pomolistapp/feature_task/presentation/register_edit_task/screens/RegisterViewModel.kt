@@ -40,9 +40,9 @@ class RegisterViewModel @Inject constructor(
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
     var priorityTask = mutableStateOf(0)
-    var workTime = mutableStateOf(0)
-    var breakTime = mutableStateOf(0)
-    var pomodoroCount = mutableStateOf(0)
+    var workTime = mutableStateOf("")
+    var breakTime = mutableStateOf("")
+    var pomodoroCount = mutableStateOf("")
 
     init {
         savedStateHandle.get<Int>("id")?.let { id ->

@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,11 +57,15 @@ import com.pomolist.feature_task.presentation.home.HomeEvent
 import com.pomolist.feature_task.presentation.home.components.NavigationDrawerItems
 import com.pomolist.feature_task.presentation.home.components.SwipeContent
 import com.pomolist.feature_task.presentation.home.components.TaskItem
+import com.pomolist.feature_task.presentation.timer.components.NotificationService
 import com.pomolistapp.core.navigation.Screen
 import com.pomolistapp.feature_task.domain.model.Task
 import com.pomolistapp.ui.theme.primaryColor
 import com.pomolistapp.ui.theme.secondaryColor
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -71,6 +76,16 @@ fun HomeScreen(
 ) {
     val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // Notificações
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val currentDate = LocalDate.now().format(formatter)
+
+    val notification = NotificationService(LocalContext.current)
+
+    if (homeViewModel.task.date == currentDate) {
+        notification.showNotificationTodayTask()
+    }
 
     Surface {
         ModalNavigationDrawer(

@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PomoListApp20Theme {
-                // A surface container using the 'background' color from the theme
                 Surface {
                     val navController = rememberNavController()
                     Navigation(navController)

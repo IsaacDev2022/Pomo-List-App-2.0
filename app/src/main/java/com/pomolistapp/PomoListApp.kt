@@ -15,14 +15,14 @@ class PomoListApp: Application() {
     override fun onCreate() {
         super.onCreate()
 
-//        val notificationManager = applicationContext.getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
-//
-//        val notificationChannel = NotificationChannel(
-//            NOTIFICATION_CHANNEL_ID,
-//            NOTIFICATION_CHANNEL_NAME,
-//            NotificationManager.IMPORTANCE_HIGH
-//        )
+        val notificationManager = applicationContext.getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
 
-//        notificationManager.createNotificationChannel(notificationChannel)
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        notificationManager.createNotificationChannel(notificationChannel)
     }
 }

@@ -1,6 +1,5 @@
 package com.pomolistapp.feature_task.presentation.timer.screens
 
-import android.text.format.DateUtils
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -28,11 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,36 +38,36 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.pomolist.feature_task.presentation.timer.components.NotificationService
 import com.pomolistapp.core.navigation.Screen
 import com.pomolistapp.ui.theme.primaryColor
 import com.pomolistapp.ui.theme.secondaryColor
 import com.pomolistapp.ui.theme.tertiaryColor
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @Composable
 fun TimerScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    // Notificações
+    val timerNotification = NotificationService(LocalContext.current)
+
+    // Pomodoro
     val timerTextScale = remember { Animatable(1f) }
 
-    val workTime = 2 * 60 // 25 minutes in seconds
-    val breakTime = 1 * 60 // 5 minutes in seconds
+    val workTime = 2 * 60
+    val breakTime = 1 * 60
     var timeLeft by remember { mutableStateOf(workTime) }
     var isRunning by remember { mutableStateOf(false) }
     var isBreak by remember { mutableStateOf(false) }
-    var pomodoroCount by remember { mutableStateOf(4) } // Total Pomodoros to complete
+    var pomodoroCount by remember { mutableStateOf(4) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(isRunning, timeLeft) {
@@ -81,10 +78,12 @@ fun TimerScreen(
             if (!isBreak) {
                 isBreak = true
                 timeLeft = breakTime
+                timerNotification.showNotificationEndPomodoro()
             } else {
                 isBreak = false
                 timeLeft = workTime
                 pomodoroCount--
+                timerNotification.showNotificationEndBreak()
             }
             if (pomodoroCount == 0) {
                 isRunning = false
@@ -94,15 +93,6 @@ fun TimerScreen(
 
     val minutes = timeLeft / 60
     val seconds = timeLeft % 60
-
-    // Notificações
-//    val timerNotification = NotificationService(LocalContext.current)
-
-    // Service
-//    var context: Context = LocalContext.current
-//    var foregroundService: Intent? = null
-//
-//    foregroundService = Intent(context, TimerService::class.java)
 
     Column(
         modifier = modifier
@@ -226,7 +216,6 @@ fun TimerScreen(
                         .width(80.dp)
                         .height(60.dp),
                     onClick = {
-//                        timerNotification.showNotification()
                     },
                     colors = ButtonDefaults.buttonColors(primaryColor)
                 ) {
@@ -259,7 +248,7 @@ fun DrawArc(timeLeft: Int, totalTime: Int) {
             style = Stroke(10.dp.toPx(), cap = StrokeCap.Round)
         )
         drawArc(
-            color = if (totalTime == 1 * 60) secondaryColor else primaryColor,
+            color = if (totalTime == 1 * 60) tertiaryColor else primaryColor,
             startAngle = -90f,
             sweepAngle = sweepAngle,
             useCenter = false,
@@ -268,5 +257,3 @@ fun DrawArc(timeLeft: Int, totalTime: Int) {
         )
     }
 }
-
-fun Long.formatDuration(): String = DateUtils.formatElapsedTime(this)

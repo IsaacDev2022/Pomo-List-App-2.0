@@ -14,8 +14,8 @@ data class Task(
     val priority: Int = 0,
     val date: String = "",
     val time: String = "",
-    var workTime: Int = 0,
-    var breakTime: Int = 0,
-    var pomodoroCount: Int = 0,
+    var workTime: String = "",
+    var breakTime: String = "",
+    var pomodoroCount: String = "",
     var completed: Boolean = false
 )

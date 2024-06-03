@@ -30,11 +30,35 @@ class NotificationService(
         PendingIntent.FLAG_IMMUTABLE
     )
 
-    fun showNotification() {
+    fun showNotificationEndPomodoro() {
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Teste")
-            .setContentText("Ola mundo")
+            .setSmallIcon(R.drawable.pomodoro)
+            .setContentTitle("Fim!!")
+            .setContentText("Pomodoro finalizado!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    fun showNotificationEndBreak() {
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.pomodoro)
+            .setContentTitle("Fim!!")
+            .setContentText("Intervalo finalizado!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    fun showNotificationTodayTask() {
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.pomodoro)
+            .setContentTitle("Alerta")
+            .setContentText("Voce tem tarefas agendadas para hoje!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .build()

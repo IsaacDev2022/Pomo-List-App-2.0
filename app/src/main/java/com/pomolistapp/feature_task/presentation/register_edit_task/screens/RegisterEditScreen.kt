@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.DateRange
@@ -63,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.pomolist.feature_task.presentation.register_edit_task.components.Priority
 import com.pomolist.feature_task.presentation.register_edit_task.components.PriorityComponent
+import com.pomolist.feature_task.presentation.register_edit_task.components.TextFieldState
 import com.pomolistapp.core.navigation.Screen
 import com.pomolistapp.feature_task.presentation.register_edit_task.RegisterEvent
 import com.pomolistapp.ui.theme.primaryColor
@@ -86,6 +89,14 @@ fun RegisterEditScreen(
     var workTime = registerViewModel.workTime.value
     var breakTime = registerViewModel.breakTime.value
     var pomodoroCount = registerViewModel.pomodoroCount.value
+
+    var nameStateError by remember { mutableStateOf("") }
+    var descriptionStateError by remember { mutableStateOf("") }
+    var dateStateError by remember { mutableStateOf("") }
+    var timeStateError by remember { mutableStateOf("") }
+    var workTimeStateError by remember { mutableStateOf("") }
+    var breakTimeStateError by remember { mutableStateOf("") }
+    var pomodoroCountStateError by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = true) {
         registerViewModel.uiEventFlow.collectLatest { event ->
@@ -133,6 +144,7 @@ fun RegisterEditScreen(
             modifier = Modifier
                 .padding(start = 20.dp, end = 20.dp, bottom = 16.dp)
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(80.dp))
             OutlinedTextField(
@@ -142,6 +154,7 @@ fun RegisterEditScreen(
                 value = nameState.text,
                 onValueChange = { registerViewModel.onEvent(RegisterEvent.EnteredName(it)) },
                 label = { Text("Nome") },
+                isError = nameStateError.isNotEmpty(),
                 leadingIcon = {
                     Icon(
                         modifier = Modifier.padding(end = 10.dp),
@@ -155,17 +168,25 @@ fun RegisterEditScreen(
                     imeAction = ImeAction.Next
                 )
             )
+            if (nameStateError.isNotEmpty()) {
+                Text(
+                    text = nameStateError,
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(100.dp)
                     .testTag("DescriptionTF"),
                 value = descriptionState.text,
                 onValueChange = { registerViewModel.onEvent(RegisterEvent.EnteredDescription(it)) },
                 label = { Text("Descrição") },
+                isError = descriptionStateError.isNotEmpty(),
                 leadingIcon = {
                     Icon(
                         modifier = Modifier.padding(end = 10.dp),
@@ -179,17 +200,35 @@ fun RegisterEditScreen(
                     imeAction = ImeAction.Next
                 )
             )
+            if (descriptionStateError.isNotEmpty()) {
+                Text(
+                    text = descriptionStateError,
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            val focusManager = LocalFocusManager.current
+
+            // Date Picker
+            val datePickerState = rememberDatePickerState()
+            var showDatePicker by remember { mutableStateOf(false) }
+
+            var selectedDate by remember { mutableStateOf(dateState.text) }
+
+            // Time Picker
+            val timePickerState = rememberTimePickerState(is24Hour = true)
+            var showTimePicker by remember { mutableStateOf(false) }
+
+            var selectedTime by remember { mutableStateOf(timeState.text) }
+
+            val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
+
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                val focusManager = LocalFocusManager.current
-                // Date Picker
-                val datePickerState = rememberDatePickerState()
-                var showDatePicker by remember { mutableStateOf(false) }
 
-                var selectedDate by remember { mutableStateOf(dateState.text) }
-
+                // Date Picker TextField
                 if (showDatePicker) {
                     DatePickerDialog(
                         onDismissRequest = { /*TODO*/ },
@@ -218,37 +257,40 @@ fun RegisterEditScreen(
                     }
                 }
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .width(160.dp)
-                        .onFocusEvent {
-                            if (it.isFocused) {
-                                showDatePicker = true
-                                focusManager.clearFocus(force = true)
+                Column {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .width(170.dp)
+                            .onFocusEvent {
+                                if (it.isFocused) {
+                                    showDatePicker = true
+                                    focusManager.clearFocus(force = true)
+                                }
                             }
+                            .testTag("DateTF"),
+                        value = selectedDate,
+                        onValueChange = { selectedDate = it },
+                        label = { Text("Data") },
+                        isError = dateStateError.isNotEmpty(),
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.padding(end = 10.dp),
+                                imageVector = Icons.Filled.DateRange,
+                                tint = primaryColor,
+                                contentDescription = "Imagem"
+                            )
                         }
-                        .testTag("DateTF"),
-                    value = selectedDate,
-                    onValueChange = { selectedDate = it },
-                    label = { Text("Data") },
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.padding(end = 10.dp),
-                            imageVector = Icons.Filled.DateRange,
-                            tint = primaryColor,
-                            contentDescription = "Imagem"
+                    )
+                    if (dateStateError.isNotEmpty()) {
+                        Text(
+                            text = dateStateError,
+                            color = Color.Red,
+                            fontSize = 12.sp
                         )
                     }
-                )
+                }
 
-                // Time Picker
-                val timePickerState = rememberTimePickerState(is24Hour = true)
-                var showTimePicker by remember { mutableStateOf(false) }
-
-                var selectedTime by remember { mutableStateOf(timeState.text) }
-
-                val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
-
+                // Time Picker TextField
                 if (showTimePicker) {
                     TimePickerDialog(
                         title = "00:00",
@@ -277,31 +319,41 @@ fun RegisterEditScreen(
                     }
                 }
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusEvent {
-                            if (it.isFocused) {
-                                showTimePicker = true
-                                focusManager.clearFocus(force = true)
+                Column {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusEvent {
+                                if (it.isFocused) {
+                                    showTimePicker = true
+                                    focusManager.clearFocus(force = true)
+                                }
                             }
+                            .testTag("TimeTF"),
+                        value = selectedTime,
+                        onValueChange = { selectedTime = it },
+                        label = { Text("Horário") },
+                        isError = timeStateError.isNotEmpty(),
+                        leadingIcon = {
+                            Icon(
+                                modifier = Modifier.padding(end = 10.dp),
+                                imageVector = Icons.Filled.Timer,
+                                tint = primaryColor,
+                                contentDescription = "Imagem"
+                            )
                         }
-                        .testTag("TimeTF"),
-                    value = selectedTime,
-                    onValueChange = { selectedTime = it },
-                    label = { Text("Horário") },
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.padding(end = 10.dp),
-                            imageVector = Icons.Filled.Timer,
-                            tint = primaryColor,
-                            contentDescription = "Imagem"
+                    )
+                    if (timeStateError.isNotEmpty()) {
+                        Text(
+                            text = timeStateError,
+                            color = Color.Red,
+                            fontSize = 12.sp
                         )
                     }
-                )
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             Text(
                 text = "Prioridade",
@@ -309,7 +361,7 @@ fun RegisterEditScreen(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             var taskPriority by remember { mutableStateOf(Priority.MEDIUM) }
 
@@ -319,11 +371,11 @@ fun RegisterEditScreen(
             }
 
             // Pomodoro
-            val minutesTask = remember { mutableStateOf(workTime.toString()) }
-            val breakTask = remember { mutableStateOf(workTime.toString()) }
-            val pomodoroCount = remember { mutableStateOf(pomodoroCount.toString()) }
+            val minutesTask = remember { mutableStateOf(workTime) }
+            val breakTask = remember { mutableStateOf(breakTime) }
+            val pomodoroCount = remember { mutableStateOf(pomodoroCount) }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
             Column {
                 Text(
                     text = "Pomodoro",
@@ -332,72 +384,168 @@ fun RegisterEditScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    OutlinedTextField(
-                        modifier = Modifier.width(110.dp),
-                        value = minutesTask.value,
-                        onValueChange = { minutesTask.value = it },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        label = { Text("Tempo") },
-                        leadingIcon = {
-                            Icon(
-                                modifier = Modifier.padding(end = 10.dp),
-                                imageVector = Icons.Filled.PunchClock,
-                                tint = primaryColor,
-                                contentDescription = "Imagem"
+                    Column {
+                        OutlinedTextField(
+                            modifier = Modifier.width(160.dp),
+                            value = minutesTask.value,
+                            onValueChange = { minutesTask.value = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            label = { Text("Tempo") },
+                            isError = workTimeStateError.isNotEmpty(),
+                            leadingIcon = {
+                                Icon(
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    imageVector = Icons.Filled.PunchClock,
+                                    tint = primaryColor,
+                                    contentDescription = "Imagem"
+                                )
+                            }
+                        )
+                        if (workTimeStateError.isNotEmpty()) {
+                            Text(
+                                text = workTimeStateError,
+                                color = Color.Red,
+                                fontSize = 12.sp
                             )
                         }
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier.width(110.dp),
-                        value = breakTask.value,
-                        onValueChange = { breakTask.value = it },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        label = { Text("Intervalo") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Filled.LockClock,
-                                tint = primaryColor,
-                                contentDescription = "Imagem"
-                            )
-                        }
-                    )
-                    OutlinedTextField(
-                        modifier = Modifier.width(110.dp),
-                        value = pomodoroCount.value,
-                        onValueChange = { pomodoroCount.value = it },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        label = { Text("Quantidade") },
-                        leadingIcon = {
-                            Icon(
-                                modifier = Modifier.padding(end = 6.dp),
-                                imageVector = Icons.Filled.LockClock,
-                                tint = primaryColor,
-                                contentDescription = "Imagem"
-                            )
-                        }
-                    )
+                    }
 
-                    registerViewModel.workTime.value = minutesTask.value.toInt()
-                    registerViewModel.breakTime.value = pomodoroCount.value.toInt()
+                    Column {
+                        OutlinedTextField(
+                            modifier = Modifier.width(160.dp),
+                            value = breakTask.value,
+                            onValueChange = { breakTask.value = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            label = { Text("Intervalo") },
+                            isError = breakTimeStateError.isNotEmpty(),
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Filled.LockClock,
+                                    tint = primaryColor,
+                                    contentDescription = "Imagem"
+                                )
+                            }
+                        )
+                        if (breakTimeStateError.isNotEmpty()) {
+                            Text(
+                                text = breakTimeStateError,
+                                color = Color.Red,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+                OutlinedTextField(
+                    modifier = Modifier.width(180.dp),
+                    value = pomodoroCount.value,
+                    onValueChange = { pomodoroCount.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    label = { Text("Quantidade") },
+                    isError = pomodoroCountStateError.isNotEmpty(),
+                    leadingIcon = {
+                        Icon(
+                            modifier = Modifier.padding(end = 6.dp),
+                            imageVector = Icons.Filled.LockClock,
+                            tint = primaryColor,
+                            contentDescription = "Imagem"
+                        )
+                    }
+                )
+                if (pomodoroCountStateError.isNotEmpty()) {
+                    Text(
+                        text = pomodoroCountStateError,
+                        color = Color.Red,
+                        fontSize = 12.sp
+                    )
                 }
             }
 
+            registerViewModel.workTime.value = minutesTask.value
+            registerViewModel.breakTime.value = breakTask.value
+            registerViewModel.pomodoroCount.value = pomodoroCount.value
+
             Spacer(modifier = Modifier.height(5.dp))
 
-            BottomBar(
-                onInsertTask = {
-                    registerViewModel.onEvent(RegisterEvent.SaveTask)
-                }
-            )
+//            BottomBar(
+//                onInsertTask = {
+//                    registerViewModel.onEvent(RegisterEvent.SaveTask)
+//                },
+//                name = nameState,
+//                nameError = nameStateError
+//            )
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+                    .height(50.dp)
+                    .testTag("btnConfirmar"),
+                onClick = {
+                    var isValid = true
+                    if (nameState.text.isEmpty()) {
+                        nameStateError = "Preencha o campo nome"
+                        isValid = false
+                    } else {
+                        nameStateError = ""
+                    }
+                    if (descriptionState.text.isEmpty()) {
+                        descriptionStateError = "Preencha o campo descrição"
+                        isValid = false
+                    } else {
+                        descriptionStateError = ""
+                    }
+                    if (selectedDate.isEmpty()) {
+                        dateStateError = "Preencha o campo data"
+                        isValid = false
+                    } else {
+                        descriptionStateError = ""
+                    }
+                    if (selectedTime.isEmpty()) {
+                        timeStateError = "Preencha o campo horário"
+                        isValid = false
+                    } else {
+                        descriptionStateError = ""
+                    }
+                    if (minutesTask.value.isEmpty()) {
+                        workTimeStateError = "Preencha o campo pomodoro"
+                        isValid = false
+                    } else {
+                        workTimeStateError = ""
+                    }
+                    if (breakTask.value.isEmpty()) {
+                        breakTimeStateError = "Preencha o campo intervalo"
+                        isValid = false
+                    } else {
+                        breakTimeStateError = ""
+                    }
+                    if (pomodoroCount.value.isEmpty()) {
+                        pomodoroCountStateError = "Preencha o campo quantidade"
+                        isValid = false
+                    } else {
+                        pomodoroCountStateError = ""
+                    }
+
+                    if (isValid) {
+                        registerViewModel.onEvent(RegisterEvent.SaveTask)
+                    }
+                },
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(primaryColor)
+            ) {
+                Text(
+                    text = "Confirmar",
+                    fontSize = 15.sp
+                )
+            }
         }
 
     }
@@ -459,7 +607,9 @@ fun TimePickerDialog(
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
-    onInsertTask: () -> Unit
+    onInsertTask: () -> Unit,
+    name: TextFieldState,
+    nameError: String
 ) {
     Button(
         modifier = modifier
@@ -467,7 +617,13 @@ fun BottomBar(
             .padding(top = 20.dp)
             .height(50.dp)
             .testTag("btnConfirmar"),
-        onClick = { onInsertTask() },
+        onClick = {
+            var isValid = true
+            if (name.text.isEmpty()) {
+
+            }
+            onInsertTask()
+                  },
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(primaryColor)
     ) {
