@@ -54,11 +54,35 @@ class NotificationService(
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
+    fun showNotificationNowTask() {
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.pomodoro)
+            .setContentTitle("Alerta")
+            .setContentText("Voce tem tarefas agendadas para agora!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    fun showNotificationExpireSoonTask() {
+        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.pomodoro)
+            .setContentTitle("Alerta")
+            .setContentText("Voce tem uma tarefa que expira em uma hora!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
     fun showNotificationTodayTask() {
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.pomodoro)
             .setContentTitle("Alerta")
-            .setContentText("Voce tem tarefas agendadas para hoje!")
+            .setContentText("Voce tem uma tarefas agendadas para hoje!")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .build()

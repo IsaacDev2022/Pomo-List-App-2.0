@@ -371,9 +371,9 @@ fun RegisterEditScreen(
             }
 
             // Pomodoro
-            val minutesTask = remember { mutableStateOf(workTime) }
-            val breakTask = remember { mutableStateOf(breakTime) }
-            val pomodoroCount = remember { mutableStateOf(pomodoroCount) }
+//            val minutesTask = remember { mutableStateOf(workTime.text) }
+//            val breakTask = remember { mutableStateOf(breakTime.text) }
+//            val pomodoroCount = remember { mutableStateOf(pomodoroCount.text) }
 
             Spacer(modifier = Modifier.height(15.dp))
             Column {
@@ -387,8 +387,8 @@ fun RegisterEditScreen(
                     Column {
                         OutlinedTextField(
                             modifier = Modifier.width(160.dp),
-                            value = minutesTask.value,
-                            onValueChange = { minutesTask.value = it },
+                            value = workTime.text,
+                            onValueChange = { registerViewModel.onEvent(RegisterEvent.WorkTime(it)) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Next
@@ -416,8 +416,8 @@ fun RegisterEditScreen(
                     Column {
                         OutlinedTextField(
                             modifier = Modifier.width(160.dp),
-                            value = breakTask.value,
-                            onValueChange = { breakTask.value = it },
+                            value = breakTime.text,
+                            onValueChange = { registerViewModel.onEvent(RegisterEvent.BreakTime(it)) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Next
@@ -443,8 +443,8 @@ fun RegisterEditScreen(
                 }
                 OutlinedTextField(
                     modifier = Modifier.width(180.dp),
-                    value = pomodoroCount.value,
-                    onValueChange = { pomodoroCount.value = it },
+                    value = pomodoroCount.text,
+                    onValueChange = { registerViewModel.onEvent(RegisterEvent.PomodoroCount(it)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
@@ -469,19 +469,7 @@ fun RegisterEditScreen(
                 }
             }
 
-            registerViewModel.workTime.value = minutesTask.value
-            registerViewModel.breakTime.value = breakTask.value
-            registerViewModel.pomodoroCount.value = pomodoroCount.value
-
             Spacer(modifier = Modifier.height(5.dp))
-
-//            BottomBar(
-//                onInsertTask = {
-//                    registerViewModel.onEvent(RegisterEvent.SaveTask)
-//                },
-//                name = nameState,
-//                nameError = nameStateError
-//            )
 
             Button(
                 modifier = Modifier
@@ -515,19 +503,19 @@ fun RegisterEditScreen(
                     } else {
                         descriptionStateError = ""
                     }
-                    if (minutesTask.value.isEmpty()) {
+                    if (workTime.text.isEmpty()) {
                         workTimeStateError = "Preencha o campo pomodoro"
                         isValid = false
                     } else {
                         workTimeStateError = ""
                     }
-                    if (breakTask.value.isEmpty()) {
+                    if (breakTime.text.isEmpty()) {
                         breakTimeStateError = "Preencha o campo intervalo"
                         isValid = false
                     } else {
                         breakTimeStateError = ""
                     }
-                    if (pomodoroCount.value.isEmpty()) {
+                    if (pomodoroCount.text.isEmpty()) {
                         pomodoroCountStateError = "Preencha o campo quantidade"
                         isValid = false
                     } else {

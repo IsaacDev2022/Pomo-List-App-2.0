@@ -104,4 +104,7 @@ dependencies {
 
     implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.0.2")
     implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.0.2")
+
+    // Worker
+    implementation ("androidx.work:work-runtime-ktx:2.8.1")
 }
