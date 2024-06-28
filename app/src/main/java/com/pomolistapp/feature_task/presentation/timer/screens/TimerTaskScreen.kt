@@ -114,17 +114,6 @@ fun TimerTaskScreen(
                             .testTag("homeIcon")
                             .clickable { navController.navigate(Screen.HomeScreen.route) }
                     )
-                    Spacer(modifier = Modifier.width(220.dp))
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .height(40.dp)
-                            .width(40.dp)
-                            .clickable { navController.navigate(Screen.HomeScreen.route) }
-                    )
                 }
 
                 Column(

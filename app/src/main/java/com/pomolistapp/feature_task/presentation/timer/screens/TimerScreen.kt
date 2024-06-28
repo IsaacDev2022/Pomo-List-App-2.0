@@ -120,7 +120,7 @@ fun TimerScreen(
                     .padding(20.dp)
                     .height(40.dp)
                     .width(40.dp)
-                    .clickable { navController.navigate(Screen.HomeScreen.route) }
+                    .clickable { navController.navigate(Screen.SettingsScreen.route) }
             )
         }
 

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.pomolistapp.feature_task.presentation.home.screens.HomeScreen
 import com.pomolistapp.feature_task.presentation.register_edit_task.screens.RegisterEditScreen
+import com.pomolistapp.feature_task.presentation.settings.screens.SettingsScreen
 import com.pomolistapp.feature_task.presentation.timer.screens.TimerScreen
 import com.pomolistapp.feature_task.presentation.timer.screens.TimerTaskScreen
 
@@ -19,7 +20,7 @@ fun Navigation(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.HomeScreen.route
+        startDestination = Screen.TimerScreen.route
     ) {
         composable(
             route = Screen.HomeScreen.route
@@ -30,6 +31,11 @@ fun Navigation(navController: NavHostController) {
             route = Screen.TimerScreen.route
         ) {
             TimerScreen(navController)
+        }
+        composable(
+            route = Screen.SettingsScreen.route
+        ) {
+            SettingsScreen(navController)
         }
         composable(
             route = Screen.TimerTaskScreen.route,

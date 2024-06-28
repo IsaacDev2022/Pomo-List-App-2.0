@@ -5,6 +5,7 @@ sealed class Screen(val route: String) {
     object TimerScreen: Screen("timer")
     object TimerTaskScreen: Screen("timerTaskScreen?id={id}")
     object TimerTest: Screen("timerTest")
+    object SettingsScreen: Screen("settings")
     object RegisterScreen: Screen("registerScreen?id={id}")
     fun passIdTimer(id: Int?): String {
         return "timerTaskScreen?id=$id"
